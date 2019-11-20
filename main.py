@@ -28,6 +28,7 @@ def get_model():
 def train(is_debug=False):
     model = get_model()
     sess = tf.Session()
+    
     if is_debug:
         sess = tf_debug.LocalCLIDebugWrapperSession(sess)
         sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
@@ -43,6 +44,9 @@ def train(is_debug=False):
     # print("index2slot: ", index2slot)
     index_train = to_index(train_data_ed, word2index, slot2index, intent2index)
     index_test = to_index(test_data_ed, word2index, slot2index, intent2index)
+
+    saver = tf.train.Saver(write_version=tf.train.SaverDef.V2)
+
     for epoch in range(epoch_num):
         mean_loss = 0.0
         train_loss = 0.0
@@ -72,6 +76,8 @@ def train(is_debug=False):
             #         mean_loss = mean_loss / 10.0
             #     print('Average train loss at epoch %d, step %d: %f' % (epoch, i, mean_loss))
             #     mean_loss = 0
+        
+        save_path = saver.save(sess, "/rnnIF/model.ckpt")
         train_loss /= (i + 1)
         print("[Epoch {}] Average train loss: {}".format(epoch, train_loss))
 

@@ -44,7 +44,7 @@ class Model:
         encoder_f_cell = DropoutWrapper(encoder_f_cell_0,output_keep_prob=0.5)
         encoder_b_cell = DropoutWrapper(encoder_b_cell_0,output_keep_prob=0.5)
         # encoder_inputs_time_major = tf.transpose(self.encoder_inputs_embedded, perm=[1, 0, 2])
-        # he dimensions of the following four variables：T*B*D，T*B*D，B*D，B*D
+        # he dimensions of the following four variables：T*B*D, T*B*D, B*D, B*D
         (encoder_fw_outputs, encoder_bw_outputs), (encoder_fw_final_state, encoder_bw_final_state) = \
             tf.nn.bidirectional_dynamic_rnn(cell_fw=encoder_f_cell,
                                             cell_bw=encoder_b_cell,
@@ -173,10 +173,11 @@ class Model:
         #     summaries=['loss', 'learning_rate'])
 
     def step(self, sess, mode, trarin_batch):
+        
         """ perform each batch"""
-        if mode not in ['train', 'test']:
-            print >> sys.stderr, 'mode is not supported'
-            sys.exit(1)
+        #if mode not in ['train', 'test']:
+        #    print >> sys.stderr, 'mode is not supported'
+        #    sys.exit(1)
         unziped = list(zip(*trarin_batch))
         # print(np.shape(unziped[0]), np.shape(unziped[1]),
         #       np.shape(unziped[2]), np.shape(unziped[3]))
@@ -187,10 +188,13 @@ class Model:
                          self.encoder_inputs_actual_length: unziped[1],
                          self.decoder_targets: unziped[2],
                          self.intent_targets: unziped[3]}
+            
+            
         if mode in ['test']:
             output_feeds = [self.decoder_prediction, self.intent]
             feed_dict = {self.encoder_inputs: np.transpose(unziped[0], [1, 0]),
                          self.encoder_inputs_actual_length: unziped[1]}
 
+        
         results = sess.run(output_feeds, feed_dict=feed_dict)
         return results
